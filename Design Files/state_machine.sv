@@ -9,7 +9,7 @@
 
 
 
-module state_machine(input logic rst, input logic scl, input logic start_cond, input logic stop_cond, input logic address_match,
+module state_machine(input logic rst_n, input logic scl, input logic start_cond, input logic stop_cond, input logic address_match,
                      input logic read_bit, input logic write_bit, input logic [3:0] clock_count, input logic hold_clock_low, input logic recieved_nack,
                      output logic read_address, output logic write_ack, output logic read_ack,
                      output logic read_data, output logic write_data, output logic scl_low_en);
@@ -18,8 +18,8 @@ logic [3:0] state;
 logic [3:0] next_state;
 
 
-always_ff @(posedge scl, negedge rst, posedge start_cond, posedge stop_cond) begin
-  if (!rst)
+always_ff @(posedge scl, negedge rst_n, posedge start_cond, posedge stop_cond) begin
+  if (!rst_n)
     state <= `S_Wait;
   else if (start_cond)
     state <= `S_ReadAddress;
@@ -35,33 +35,6 @@ always_comb begin
         next_state = `S_Wait;
     end
 
-/*
-    `S_ReadAddress: begin
-      if(clock_count == 9'd6)
-        next_state = `S_WriteAck1;
-      else
-        next_state = `S_ReadAddress;
-    end
-
-
-    `S_WriteAck1: begin
-      if(address_match)
-        next_state = `S_ReadRW;
-      else
-        next_state = `S_Wait;
-    end
-
-
-    `S_ReadRW: begin
-      if(read_bit)
-        next_state = `S_ReadData;
-      else if(write_bit)
-        next_state = `S_WriteData;
-      else
-        next_state = `S_Wait;
-    end
-*/
-
     `S_ReadAddress: begin
       if((clock_count == 9'd7) && (address_match))
         next_state = `S_WriteAck1;
@@ -70,7 +43,6 @@ always_comb begin
       else
         next_state = `S_ReadAddress;
     end
-
 
     `S_WriteAck1: begin
       if(read_bit)
@@ -142,32 +114,6 @@ always_comb begin
         scl_low_en = 1'b0;
     end
 
-/*
-    `S_WriteAck1: begin
-      read_address = 1'b1;
-      //if(address_match)
-      //  write_ack = 1'b1;
-      //else
-      write_ack = 1'b0;
-      //read_ack = 1'b0;
-      read_data = 1'b0;
-      write_data = 1'b0;
-    end
-
-    `S_ReadRW: begin
-      read_address = 1'b0;
-      write_ack = 1'b1;
-      //read_ack = 1'b0;
-      if(read_bit)
-        read_data = 1'b1;
-      else
-        read_data = 1'b0;
-      if(write_bit)
-        write_data = 1'b1;
-      else
-        write_data = 1'b0;
-    end
-*/
     `S_ReadData: begin
       read_address = 1'b0;
       write_ack = 1'b0;
@@ -213,7 +159,7 @@ always_comb begin
     default: begin
       read_address = 1'b0;
       write_ack = 1'b0;
-      //read_ack = 1'b0;
+      read_ack = 1'b0;
       read_data = 1'b0;
       write_data = 1'b0;
       scl_low_en = 1'b0;
