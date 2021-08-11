@@ -8,7 +8,7 @@ module clockcount (input logic rst, input logic scl, input logic start, input lo
 logic [3:0] count_next;
 logic en;
 
-always_ff @(negedge rst, posedge scl) begin
+always_ff @(negedge rst, posedge start, posedge stop) begin
   if(!rst)
     en <= 1'b0;
   else if (start)
@@ -16,6 +16,7 @@ always_ff @(negedge rst, posedge scl) begin
   else if (stop)
     en <= 1'b0;
 end
+
 
 always @(*) begin
   if(count >=  4'd8)
@@ -30,5 +31,12 @@ always_ff @(negedge rst, posedge scl) begin
   else if (en)
     count = count_next;
 end
+
+always_ff @(negedge scl) begin
+  if(start)
+    count <= 4'd0;
+end
+
+
 
 endmodule: clockcount
