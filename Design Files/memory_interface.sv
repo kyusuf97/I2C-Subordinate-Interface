@@ -33,8 +33,7 @@ memory_address_checker mac(rst_n, clk, sda_in, scl_in,
                            read_mem_address, clock_count, increment_mem_address,
                            mem_address, mem_read_bit, mem_write_bit);
 
-//eeprom_mem em(mem_address, clk, mem_buffer, wren, mem_rddata);
-assign mem_rddata = 8'b10011010;
+mem s_ram(mem_address, clk, mem_buffer, wren, mem_rddata);
 
 //memory buffer
 always_ff @(negedge rst_n, posedge scl_in) begin

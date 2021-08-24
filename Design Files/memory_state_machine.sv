@@ -9,6 +9,7 @@
 `define S_WRITE_ACK_4 4'd8
 `define S_MEM_READ_DATA 4'd9
 `define S_READ_ACK 4'd10
+`define S_INCREMENT_MEM_ADDRESS_2 4'd11
 
 
 module memory_state_machine(input logic rst_n, input logic clk, input logic read_bit, input logic write_bit,
@@ -57,7 +58,9 @@ always_comb begin
         next_state = `S_WRITE_ACK_2;
     end
     `S_WRITE_MEM_DATA: begin
-      if(i2c_state == 4'd6) // i2c_state == S_WRITE_ACK_2
+      if (i2c_state == 4'd1)
+        next_state = `S_WAIT;
+      else if(i2c_state == 4'd6) // i2c_state == S_WRITE_ACK_2
         next_state = `S_WRITE_ACK_3;
       else
         next_state = `S_WRITE_MEM_DATA;
@@ -95,9 +98,12 @@ always_comb begin
     end
     `S_READ_ACK: begin
       if(i2c_state == 4'd7)
-        next_state = `S_MEM_READ_DATA;
+        next_state = `S_INCREMENT_MEM_ADDRESS_2;
       else
         next_state = `S_READ_ACK;
+    end
+    `S_INCREMENT_MEM_ADDRESS_2: begin
+      next_state = `S_MEM_READ_DATA;
     end
     default: next_state = `S_WAIT;
   endcase
@@ -150,7 +156,7 @@ always_comb begin
       read_mem_address = 0;
       write_mem = 0;
       read_mem = 0;
-      wren = 0;
+      wren = 1;
       increment_mem_address = 0;
     end
     `S_INCREMENT_MEM_ADDRESS: begin
@@ -192,6 +198,14 @@ always_comb begin
       read_mem = 0;
       wren = 0;
       increment_mem_address = 0;
+    end
+    `S_INCREMENT_MEM_ADDRESS_2: begin
+      write_ack = 0;
+      read_mem_address = 0;
+      write_mem = 0;
+      read_mem = 0;
+      wren = 0;
+      increment_mem_address = 1;
     end
     default: begin
       write_ack = 0;

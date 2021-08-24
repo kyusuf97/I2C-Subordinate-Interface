@@ -1,3 +1,5 @@
+`timescale 1ps / 1ps
+
 
 module tb_i2c_top();
 
@@ -17,6 +19,7 @@ assign scl = scl_enable ? scl_driver : 1'bz;
 assign sda = sda_enable ? sda_driver : 1'bz;
 
 i2c_top DUT(rst, clk, scl, sda, hold_clock_low);
+
 
 initial begin
   clk = 1'b1;
@@ -42,7 +45,7 @@ initial begin
   sda_driver = 1'b0; //Start condition
   #10;
 
-/*
+
   //Master send correct device address
   sda_driver = 1'b1;
   #20;
@@ -69,13 +72,13 @@ initial begin
 
   sda_driver = 1'b0; //Bit 1 of data
   #20;
-  sda_driver = 1'b1;
+  sda_driver = 1'b0;
   #20;
   sda_driver = 1'b0;
   #20;
-  sda_driver = 1'b1;
+  sda_driver = 1'b0;
   #20;
-  sda_driver = 1'b1;
+  sda_driver = 1'b0;
   #20;
   sda_driver = 1'b0;
   #20;
@@ -91,17 +94,17 @@ initial begin
   //Send 8 bits of data
   sda_enable = 1'b1;
 
-  sda_driver = 1'b1; //Bit 1 of data
-  #20;
-  sda_driver = 1'b1;
+  sda_driver = 1'b0; //Bit 1 of data
   #20;
   sda_driver = 1'b0;
   #20;
   sda_driver = 1'b0;
   #20;
-  sda_driver = 1'b1;
+  sda_driver = 1'b0;
   #20;
-  sda_driver = 1'b1;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b0;
   #20;
   sda_driver = 1'b0;
   #20;
@@ -116,23 +119,24 @@ initial begin
 
   sda_driver = 1'b0; //Bit 1 of data
   #20;
-  sda_driver = 1'b1;
-  #20;
   sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b1;
   #20;
   sda_driver = 1'b0;
   #20;
   sda_driver = 1'b0;
   #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b0;
+  #20;
   sda_driver = 1'b1;
   #20;
-  sda_driver = 1'b1; //Bit 8 of data
+  sda_driver = 1'b0; //Bit 8 of data
   #20;
 
   sda_enable = 1'b0; //Slave send ack
   #20;
+
 
 /*
   sda_enable = 1'b1;
@@ -159,23 +163,22 @@ initial begin
   #20;
   sda_enable = 1'b0; //Send ack
   #20;
-
+*/
   sda_enable = 1'b1;
   sda_driver = 1'b0;
   #10;
   sda_driver = 1'b1; //Stop condition
   #10;
   scl_enable = 1'b0;
-  #60
+  #100
 
 
   scl_enable = 1'b1;
   #10;
   sda_driver = 1'b0; //Start Condition
   #10;
-  scl_enable = 1'b1;
 
-*/
+
 
   //Send correct device address
   sda_driver = 1'b1;
@@ -203,17 +206,17 @@ initial begin
 
   sda_driver = 1'b0; //Bit 1 of data
   #20;
-  sda_driver = 1'b1;
-  #20;
   sda_driver = 1'b0;
   #20;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b1;
+  sda_driver = 1'b0;
   #20;
   sda_driver = 1'b0;
   #20;
   sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b1;
   #20;
   sda_driver = 1'b1; //Read bit
   #20;
