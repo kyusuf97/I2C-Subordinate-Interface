@@ -12,17 +12,18 @@
 module state_machine(input logic rst_n, input logic scl, input logic start_cond, input logic stop_cond, input logic address_match,
                      input logic read_bit, input logic write_bit, input logic [3:0] clock_count, input logic hold_clock_low, input logic recieved_nack,
                      output logic read_address, output logic write_ack, output logic read_ack,
-                     output logic read_data, output logic write_data, output logic scl_low_en);
+                     output logic read_data, output logic write_data, output logic scl_low_en, output logic [3:0] i2c_state);
 
 logic [3:0] state;
 logic [3:0] next_state;
 
+assign i2c_state = state;
 
 always_ff @(posedge scl, negedge rst_n, posedge start_cond, posedge stop_cond) begin
   if (!rst_n)
     state <= `S_Wait;
   else if (start_cond)
-    state <= `S_ReadAddress;
+    state <= `S_ReadAddress; //Enter read address start on start or repeated start condition
   else if (stop_cond)
     state <= `S_Wait;
   else
@@ -32,7 +33,7 @@ end
 always_comb begin
   case(state)
     `S_Wait: begin
-        next_state = `S_Wait;
+        next_state = `S_Wait; //Only exit wait state on start condition
     end
 
     `S_ReadAddress: begin
@@ -45,14 +46,14 @@ always_comb begin
     end
 
     `S_WriteAck1: begin
-      if(read_bit)
+      if(write_bit) //master sends write bit, subordinate will read incoming data from master
         next_state = `S_ReadData;
-      else if(write_bit)
+      else if(read_bit) //master sends read bit, subordinate will write data to master
         next_state = `S_WriteData;
       else
         next_state = `S_Wait;
     end
-
+    //M->S subordinate reads incoming data from master
     `S_ReadData: begin
       if(clock_count == 9'd7)
         next_state = `S_WriteAck2;
@@ -63,7 +64,7 @@ always_comb begin
     `S_WriteAck2: begin
       next_state = `S_ReadData;
     end
-
+    //S->M subordinate writes data to master
     `S_WriteData: begin
       if (recieved_nack == 1'b1)
         next_state = `S_Wait;
