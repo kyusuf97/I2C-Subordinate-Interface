@@ -2,6 +2,7 @@
 module tb_i2c_top();
 
 logic rst;
+logic clk;
 wire scl;
 wire sda;
 logic hold_clock_low;
@@ -15,7 +16,13 @@ logic sda_enable;
 assign scl = scl_enable ? scl_driver : 1'bz;
 assign sda = sda_enable ? sda_driver : 1'bz;
 
-i2c_top DUT(rst, scl, sda, hold_clock_low);
+i2c_top DUT(rst, clk, scl, sda, hold_clock_low);
+
+initial begin
+  clk = 1'b1;
+  #1;
+  forever #1 clk = ~clk;
+end
 
 initial begin
   scl_enable = 1'b1;
@@ -35,6 +42,7 @@ initial begin
   sda_driver = 1'b0; //Start condition
   #10;
 
+/*
   //Master send correct device address
   sda_driver = 1'b1;
   #20;
@@ -50,22 +58,71 @@ initial begin
   #20;
   sda_driver = 1'b0;
   #20;
-  sda_driver = 1'b1; //Read bit
+  sda_driver = 1'b0; //Write bit
   #20;
+
   sda_enable = 1'b0; //Slave send ack
   #20
 
-  //Send 8 bits of data
-  sda_driver = 1'b1; //Bit 1 of data
+  //Send 7 bit memory address and write bit
   sda_enable = 1'b1;
+
+  sda_driver = 1'b0; //Bit 1 of data
+  #20;
+  sda_driver = 1'b1;
   #20;
   sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b0; //Write bit
+  #20;
+
+  sda_enable = 1'b0; //Slave send ack
+  #20;
+
+
+  //Send 8 bits of data
+  sda_enable = 1'b1;
+
+  sda_driver = 1'b1; //Bit 1 of data
+  #20;
+  sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b1; //Bit 8 of data
+  #20;
+
+  sda_enable = 1'b0; //Slave send ack
+  #20;
+
+  //Send 8 bits of data
+  sda_enable = 1'b1;
+
+  sda_driver = 1'b0; //Bit 1 of data
   #20;
   sda_driver = 1'b1;
   #20;
   sda_driver = 1'b0;
   #20;
   sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b0;
   #20;
   sda_driver = 1'b0;
   #20;
@@ -73,11 +130,11 @@ initial begin
   #20;
   sda_driver = 1'b1; //Bit 8 of data
   #20;
+
   sda_enable = 1'b0; //Slave send ack
   #20;
 
-
-
+/*
   sda_enable = 1'b1;
   sda_driver = 1'b1;
   #10;
@@ -111,11 +168,14 @@ initial begin
   scl_enable = 1'b0;
   #60
 
+
   scl_enable = 1'b1;
   #10;
   sda_driver = 1'b0; //Start Condition
   #10;
   scl_enable = 1'b1;
+
+*/
 
   //Send correct device address
   sda_driver = 1'b1;
@@ -136,6 +196,58 @@ initial begin
   #20;
   sda_enable = 1'b0; //Slave send ack
   #20
+
+
+  //Send 7 bit memory address and read bit
+  sda_enable = 1'b1;
+
+  sda_driver = 1'b0; //Bit 1 of data
+  #20;
+  sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b1; //Read bit
+  #20;
+
+  sda_enable = 1'b0; //Slave send ack
+  #20;
+
+  sda_enable = 1;
+  #10;
+  sda_driver = 1'b0; //Repeated Start Condition
+  #10;
+
+
+  //Master send correct device address
+  sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b1;
+  #20;
+  sda_driver = 1'b0;
+  #20;
+  sda_driver = 1'b1; //Read bit
+  #20;
+
+  sda_enable = 1'b0; //Slave send ack
+  #20
+
 
   //Device send 8 bits of data
   sda_enable = 1'b0;
@@ -185,7 +297,6 @@ initial begin
 
   #20;
 
-
   sda_enable = 1'b1;
   sda_driver = 1'b0;
   #10;
@@ -193,7 +304,7 @@ initial begin
   #10;
   scl_enable = 1'b0;
   #60
-
+/*
   scl_enable = 1'b1;
   #10;
   sda_driver = 1'b0; //Start Condition
@@ -292,7 +403,7 @@ initial begin
   scl_enable = 1'b0;
   #60
 
-
+*/
 
 
   $stop;
