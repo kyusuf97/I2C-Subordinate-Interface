@@ -14,7 +14,7 @@
 
 module memory_state_machine(input logic rst_n, input logic clk, input logic read_bit, input logic write_bit,
                             input logic [3:0] i2c_state, input logic mem_read_bit, input logic mem_write_bit,
-                            input logic sda_en,
+                            input logic sda_en, input logic recieved_nack,
                             output logic write_ack, output logic read_mem_address, output logic write_mem,
                             output logic read_mem, output logic wren, output logic increment_mem_address);
 
@@ -32,7 +32,7 @@ end
 always_comb begin
   case(state)
     `S_WAIT: begin
-      if(write_bit)
+      if(write_bit && (i2c_state == 4'd3))
         next_state = `S_WRITE_ACK_1;
       else
         next_state = `S_WAIT;
@@ -58,13 +58,14 @@ always_comb begin
         next_state = `S_WRITE_ACK_2;
     end
     `S_WRITE_MEM_DATA: begin
-      if (i2c_state == 4'd1)
+      if ((i2c_state == 4'd1) || (i2c_state == 4'd2))
         next_state = `S_WAIT;
       else if(i2c_state == 4'd6) // i2c_state == S_WRITE_ACK_2
         next_state = `S_WRITE_ACK_3;
       else
         next_state = `S_WRITE_MEM_DATA;
     end
+
     `S_WRITE_ACK_3: begin //(save mem data)
       if(i2c_state == 4'd5 && !sda_en)
         next_state = `S_INCREMENT_MEM_ADDRESS;
@@ -89,15 +90,17 @@ always_comb begin
         next_state = `S_WRITE_ACK_4;
     end
     `S_MEM_READ_DATA: begin
-      if(i2c_state == 4'd1)
-        next_state = `S_WAIT;
-      else if(i2c_state == 4'd8)
+      //if((i2c_state == 4'd1) || (i2c_state == 4'd2))
+      //  next_state = `S_WAIT;
+      if(i2c_state == 4'd8)
         next_state = `S_READ_ACK;
       else
         next_state = `S_MEM_READ_DATA;
     end
     `S_READ_ACK: begin
-      if(i2c_state == 4'd7)
+      if(recieved_nack)
+        next_state = `S_WAIT;
+      else if(i2c_state == 4'd7)
         next_state = `S_INCREMENT_MEM_ADDRESS_2;
       else
         next_state = `S_READ_ACK;

@@ -1,10 +1,13 @@
 
 
-module i2c_top(input logic rst_n, input logic clk, inout wire scl, inout wire sda, input logic hold_clock_low);
-//module i2c_top(input logic [3:0] KEY, inout wire [35:0] GPIO_0, input logic hold_clock_low);
+//module i2c_top(input logic rst_n, input logic clk, inout wire scl, inout wire sda, input logic hold_clock_low);
+module i2c_top(input logic [3:0] KEY, input logic CLOCK_50, inout wire [35:0] GPIO_0, output logic [9:0] LEDR);
 
-//logic rst_n;
-//assign rst_n = KEY[0];
+logic rst_n;
+assign rst_n = KEY[0];
+
+logic clk;
+assign clk = CLOCK_50;
 
 //SM Inputs
 logic start;
@@ -33,25 +36,27 @@ logic scl_en;
 logic set_scl_low;
 logic hold_scl_low;
 logic scl_low_en;
+logic hold_clock_low;
 //logic sda_en;
 logic sda_in;
 logic sda_out;
 logic sda_en;
 
 //GPIO_0[0] = sda
-//assign GPIO_0[0] = sda_en ? sda_out : 1'bz;
-//assign sda_in = GPIO_0[0];
-assign sda = sda_en ? sda_out : 1'bz;
-assign sda_in = sda;
+assign GPIO_0[0] = sda_en ? sda_out : 1'bz;
+assign sda_in = GPIO_0[0];
+//assign sda = sda_en ? sda_out : 1'bz;
+//assign sda_in = sda;
 
 //GPIO_0[1] = scl
-//assign GPIO_0[1] = scl_en ? scl_out: 1'bz;
-//assign scl_in = GPIO_0[1];
-assign scl = scl_en ? scl_out: 1'bz;
-assign scl_in = scl;
+assign GPIO_0[1] = scl_en ? scl_out: 1'bz;
+assign scl_in = GPIO_0[1];
+//assign scl = scl_en ? scl_out: 1'bz;
+//assign scl_in = scl;
 
 assign scl_out = 1'b0;
 
+assign hold_clock_low = 0;
 
 startstop ss(rst_n, scl_in, sda_in, start, stop);
 
@@ -69,7 +74,7 @@ address_checker ac(rst_n, sda_in, scl_in, read_address,
 
 memory_interface mi(rst_n, clk, sda_in, scl_in,
                    read_bit, write_bit, i2c_state, count,
-                   sda_en,
+                   sda_en, recieved_nack,
                    sda_out);
 
 
@@ -77,7 +82,9 @@ always_ff @(negedge scl_in, negedge rst_n) begin
   if (!rst_n)
     sda_en <= 0;
   else begin
-    if (write_ack || write_data)
+    if (recieved_nack)
+      sda_en <= 0;
+    else if (write_ack || write_data)
       sda_en <= 1;
     else
       sda_en <= 0;
@@ -124,8 +131,9 @@ always_ff @ (posedge scl_in, negedge rst_n) begin
     else
       recieved_nack <= 1'b0;
   end
-
-
 end
+
+
+assign LEDR[3:0] = i2c_state;
 
 endmodule: i2c_top
