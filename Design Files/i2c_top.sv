@@ -24,7 +24,7 @@ logic write_ack;
 logic read_data;
 logic write_data;
 logic read_ack;
-logic [3:0] i2c_state;
+logic [7:0] i2c_state;
 
 
 
