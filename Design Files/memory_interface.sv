@@ -1,6 +1,6 @@
 
 module memory_interface(input logic rst_n, input logic clk, input logic sda_in, input logic scl_in,
-                        input logic read_bit, input logic write_bit, input logic [3:0] i2c_state, input logic [3:0] clock_count,
+                        input logic read_bit, input logic write_bit, input logic [6:0] i2c_state, input logic [3:0] clock_count,
                         input logic sda_en, input logic recieved_nack,
                         output logic sda_out);
 

@@ -7,28 +7,26 @@ package i2c_state_pkg;
     // State bits for subordinate state machine
     typedef enum {
 
-        I2C_WAIT_bit         = 0,
-        I2C_READ_ADDRESS_bit = 1,
-        I2C_WRITE_ACK_1_bit  = 2,
-        I2C_READ_RW_bit      = 3,
-        I2C_READ_DATA_bit    = 4,
-        I2C_WRITE_ACK_2_bit  = 5,
-        I2C_WRITE_DATA_bit   = 6,
-        I2C_READ_ACK_bit     = 7
+      I2C_WAIT_bit               = 0,
+      I2C_MASTER_WR_DEV_ADDR_bit = 1,
+      I2C_SUB_SEND_ACK_1_bit     = 2,
+      I2C_MASTER_WR_DATA_bit     = 3,
+      I2C_SUB_SEND_ACK_2_bit     = 4,
+      I2C_MASTER_RD_DATA_bit     = 5,
+      I2C_MASTER_SEND_ACK_bit    = 6
 
     } sub_state_bit;
 
     // Shift a 1 to the bit that represents each state
-    typedef enum logic [7:0] {
+    typedef enum logic [6:0] {
 
-        I2C_WAIT         = 8'b00000001<<I2C_WAIT_bit,
-        I2C_READ_ADDRESS = 8'b00000001<<I2C_READ_ADDRESS_bit,
-        I2C_WRITE_ACK_1  = 8'b00000001<<I2C_WRITE_ACK_1_bit,
-        I2C_READ_RW      = 8'b00000001<<I2C_READ_RW_bit,
-        I2C_READ_DATA    = 8'b00000001<<I2C_READ_DATA_bit,
-        I2C_WRITE_ACK_2  = 8'b00000001<<I2C_WRITE_ACK_2_bit,
-        I2C_WRITE_DATA   = 8'b00000001<<I2C_WRITE_DATA_bit,
-        I2C_READ_ACK     = 8'b00000001<<I2C_READ_ACK_bit
+      I2C_WAIT               = 7'b1<<I2C_WAIT_bit,
+      I2C_MASTER_WR_DEV_ADDR = 7'b1<<I2C_MASTER_WR_DEV_ADDR_bit,
+      I2C_SUB_SEND_ACK_1     = 7'b1<<I2C_SUB_SEND_ACK_1_bit,
+      I2C_MASTER_WR_DATA     = 7'b1<<I2C_MASTER_WR_DATA_bit,
+      I2C_SUB_SEND_ACK_2     = 7'b1<<I2C_SUB_SEND_ACK_2_bit,
+      I2C_MASTER_RD_DATA     = 7'b1<<I2C_MASTER_RD_DATA_bit,
+      I2C_MASTER_SEND_ACK    = 7'b1<<I2C_MASTER_SEND_ACK_bit
 
     } sub_state_t;
 
@@ -38,35 +36,35 @@ package i2c_state_pkg;
 
     typedef enum {
 
-        MEM_WAIT_bit                    = 0,
-        MEM_WRITE_ACK_1_bit             = 1,
-        MEM_ADDRESS_bit                 = 2,
-        MEM_WRITE_ACK_2_bit             = 3,
-        MEM_WRITE_MEM_DATA_bit          = 4,
-		MEM_WRITE_ACK_3_bit             = 5,
-        MEM_INCREMENT_MEM_ADDRESS_bit   = 6,
-        MEM_DEVICE_ADDRESS_bit          = 7,
-        MEM_WRITE_ACK_4_bit             = 8,
-		MEM_READ_DATA_bit               = 9,
-		MEM_READ_ACK_bit                = 10,
-		MEM_INCREMENT_MEM_ADDRESS_2_bit = 11
+      RAM_WAIT_bit               = 0,
+      RAM_SUB_SEND_ACK_1_bit     = 1,
+      RAM_MASTER_WR_MEM_ADDR_bit = 2,
+      RAM_SUB_SEND_ACK_2_bit     = 3,
+      RAM_MASTER_WR_DATA_bit     = 4,
+      RAM_SUB_SEND_ACK_3_bit     = 5,
+      RAM_INCR_MEM_ADDR_1_bit    = 6,
+      RAM_MASTER_WR_DEV_ADDR_bit = 7,
+      RAM_SUB_SEND_ACK_4_bit     = 8,
+      RAM_MASTER_RD_DATA_bit     = 9,
+      RAM_MASTER_SEND_ACK_bit    = 10,
+      RAM_INCR_MEM_ADDR_2_bit    = 11
 
     } ram_state_bit;
 
-    typedef enum logic [10:0] {
+    typedef enum logic [11:0] {
 
-        MEM_WAIT                = 11'b1<<MEM_WAIT_bit,
-        MEM_WRITE_ACK_1         = 11'b1<<MEM_WRITE_ACK_1_bit,
-        MEM_ADDRESS             = 11'b1<<MEM_ADDRESS_bit,
-        MEM_WRITE_ACK_2         = 11'b1<<MEM_WRITE_ACK_2_bit,
-		MEM_WRITE_DATA          = 11'b1<<MEM_WRITE_DATA_bit, 
-		MEM_WRITE_ACK_3         = 11'b1<<MEM_WRITE_ACK_3_bit,
-	    MEM_INCREMENT_ADDRESS   = 11'b1<<MEM_INCREMENT_ADDRESS_bit,
-		MEM_DEVICE_ADDRESS      = 11'b1<<MEM_DEVICE_ADDRESS_bit,
-		MEM_WRITE_ACK_4         = 11'b1<<MEM_WRITE_ACK_4_bit,
-        MEM_READ_DATA           = 11'b1<<MEM_READ_DATA_bit,        
-        MEM_READ_ACK            = 11'b1<<MEM_READ_ACK_bit,
-        MEM_INCREMENT_ADDRESS_2 = 11'b1<<MEM_INCREMENT_ADDRESS_2_bit        
+      RAM_WAIT               = 12'b1<<RAM_WAIT_bit,
+      RAM_SUB_SEND_ACK_1     = 12'b1<<RAM_SUB_SEND_ACK_1_bit,
+      RAM_MASTER_WR_MEM_ADDR = 12'b1<<RAM_MASTER_WR_MEM_ADDR_bit,
+      RAM_SUB_SEND_ACK_2     = 12'b1<<RAM_SUB_SEND_ACK_2_bit,
+      RAM_MASTER_WR_DATA     = 12'b1<<RAM_MASTER_WR_DATA_bit,
+      RAM_SUB_SEND_ACK_3     = 12'b1<<RAM_SUB_SEND_ACK_3_bit,
+      RAM_INCR_MEM_ADDR_1    = 12'b1<<RAM_INCR_MEM_ADDR_1_bit,
+      RAM_MASTER_WR_DEV_ADDR = 12'b1<<RAM_MASTER_WR_DEV_ADDR_bit,
+      RAM_SUB_SEND_ACK_4     = 12'b1<<RAM_SUB_SEND_ACK_4_bit,
+      RAM_MASTER_RD_DATA     = 12'b1<<RAM_MASTER_RD_DATA_bit,
+      RAM_MASTER_SEND_ACK    = 12'b1<<RAM_MASTER_SEND_ACK_bit,
+      RAM_INCR_MEM_ADDR_2    = 12'b1<<RAM_INCR_MEM_ADDR_2_bit
 
     } ram_state_t;
 
