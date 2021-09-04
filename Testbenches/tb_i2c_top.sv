@@ -5,6 +5,10 @@ module tb_i2c_top();
 
 logic rst;
 logic clk;
+logic [3:0] KEY;
+wire [35:0] GPIO_0;
+logic [9:0] LEDR;
+
 wire scl;
 wire sda;
 logic hold_clock_low;
@@ -18,7 +22,13 @@ logic sda_enable;
 assign scl = scl_enable ? scl_driver : 1'bz;
 assign sda = sda_enable ? sda_driver : 1'bz;
 
-i2c_top DUT(rst, clk, scl, sda, hold_clock_low);
+assign GPIO_0[0] = sda;
+assign GPIO_0[1] = scl;
+
+assign KEY[0] = rst;
+
+i2c_top DUT(KEY, clk, GPIO_0, LEDR);
+
 
 
 initial begin
