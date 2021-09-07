@@ -15,7 +15,7 @@ always_ff @(posedge scl, negedge rst_n, posedge start_cond, posedge stop_cond) b
     state <= I2C_WAIT;
   end
   else begin
-    if (start_cond) begin
+    if (start_cond) begin // Order of conditions here is important: check for repeated start condition before checking for stop condition.
       state <= I2C_MASTER_WR_DEV_ADDR;
     end
     else if (stop_cond) begin
