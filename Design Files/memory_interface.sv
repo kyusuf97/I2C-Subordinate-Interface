@@ -1,7 +1,7 @@
 
 module memory_interface(input logic rst_n, input logic clk, input logic sda_in, input logic scl_in,
                         input logic read_bit, input logic write_bit, input logic [6:0] i2c_state, input logic [3:0] clock_count,
-                        input logic sda_en, input logic recieved_nack,
+                        input logic sda_en, input logic received_nack,
                         output logic sda_out);
 
 
@@ -24,17 +24,17 @@ logic increment_mem_address;
 
 logic wren_set;
 logic wren_capt;
-
+logic mem_nack;
 
 memory_state_machine msm(rst_n, clk, read_bit, write_bit,
                          i2c_state, mem_read_bit, mem_write_bit,
-                         sda_en, recieved_nack,
+                         sda_en, received_nack, mem_nack,
                          write_ack, read_mem_address, write_mem,
                          read_mem, wren_set, increment_mem_address);
 
 memory_address_checker mac(rst_n, clk, sda_in, scl_in,
                            read_mem_address, clock_count, increment_mem_address,
-                           mem_address, mem_read_bit, mem_write_bit);
+                           mem_address, mem_read_bit, mem_write_bit, mem_nack);
 
 mem s_ram(mem_address, clk, mem_buffer, wren, mem_rddata);
 

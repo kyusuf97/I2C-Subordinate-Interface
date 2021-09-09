@@ -3,7 +3,7 @@ import i2c_state_pkg::*;
 
 module memory_state_machine(input logic rst_n, input logic clk, input logic read_bit, input logic write_bit,
                             input logic [6:0] i2c_state, input logic mem_read_bit, input logic mem_write_bit,
-                            input logic sda_en, input logic received_nack,
+                            input logic sda_en, input logic received_nack, input logic mem_nack,
                             output logic write_ack, output logic read_mem_address, output logic write_mem,
                             output logic read_mem, output logic wren, output logic increment_mem_address);
 
@@ -62,7 +62,7 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
                                              end
                                          end
       state[RAM_MASTER_WR_DATA_bit]:     begin
-                                             if (i2c_state_i[I2C_WAIT_bit] || i2c_state_i[I2C_MASTER_WR_DEV_ADDR_bit]) begin
+                                            if (mem_nack || i2c_state_i[I2C_WAIT_bit] || i2c_state_i[I2C_MASTER_WR_DEV_ADDR_bit]) begin
                                                  next_state = RAM_WAIT;
                                              end
                                              else if(i2c_state_i[I2C_SUB_SEND_ACK_2_bit]) begin // i2c_state == S_WRITE_ACK_2
