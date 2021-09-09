@@ -56,8 +56,8 @@ initial begin
   #10;
 
 
-
-//Test last memory address functionality. Subordinate should send nack when last address is reached (0x7F)
+/*
+//Test last memory address functionality during write operation. Subordinate should send nack when last address is reached (0x7F)
 
   //Master send correct device address
   sda_driver = 1'b1;
@@ -173,32 +173,6 @@ initial begin
   sda_enable = 1'b0; //Slave should send nack
   #20;
 
-/*
-  sda_enable = 1'b1;
-  sda_driver = 1'b1;
-  #10;
-  sda_driver = 1'b0; //Repeated Start Condition
-  #10;
-  scl_enable = 1'b1;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b1; //Read bit
-  #20;
-  sda_enable = 1'b0; //Send ack
-  #20;
-*/
   sda_enable = 1'b1;
   sda_driver = 1'b0;
   #10;
@@ -208,116 +182,14 @@ initial begin
   #100
 
 
-//Test after sending nack
+//Test last memory address functionality during read operation. Subordinate should go to wait state after last address is reached.
 
-  scl_enable = 1'b1;
+  sda_enable = 1'b0;
   #10;
   sda_driver = 1'b0; //Start Condition
   #10;
 
-
-  //Master send correct device address
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0; //Write bit
-  #20;
-
-  sda_enable = 1'b0; //Slave send ack
-  #20
-
-  //Send 7 bit memory address and write bit
-  sda_enable = 1'b1;
-
-  sda_driver = 1'b1; //Bit 1 of data
-  #20;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0; //Write bit
-  #20;
-
-  sda_enable = 1'b0; //Slave send ack
-  #20;
-
-
-  //Send first 8 bits of data
-  sda_enable = 1'b1;
-
-  sda_driver = 1'b0; //Bit 1 of data
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b1; //Bit 8 of data
-  #20;
-
-  sda_enable = 1'b0; //Slave send ack
-  #20;
-
-  //Send second 8 bits of data
-  sda_enable = 1'b1;
-
-  sda_driver = 1'b0; //Bit 1 of data
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b0;
-  #20;
-  sda_driver = 1'b1;
-  #20;
-  sda_driver = 1'b0; //Bit 8 of data
-  #20;
-
-  sda_enable = 1'b0; //Slave send ack
-  #20;
-
-  sda_enable = 1'b1;
-  sda_driver = 1'b0;
-  #10;
-  sda_driver = 1'b1; //Stop condition
-  #10;
-  scl_enable = 1'b0;
-  #100
-
-
-/*
-
+*/
   //Send correct device address
   sda_driver = 1'b1;
   #20;
@@ -342,17 +214,17 @@ initial begin
   //Send 7 bit memory address and read bit
   sda_enable = 1'b1;
 
-  sda_driver = 1'b0; //Bit 1 of data
+  sda_driver = 1'b1; //Bit 1 of data
   #20;
-  sda_driver = 1'b0;
+  sda_driver = 1'b1;
   #20;
-  sda_driver = 1'b0;
+  sda_driver = 1'b1;
   #20;
-  sda_driver = 1'b0;
+  sda_driver = 1'b1;
   #20;
-  sda_driver = 1'b0;
+  sda_driver = 1'b1;
   #20;
-  sda_driver = 1'b0;
+  sda_driver = 1'b1;
   #20;
   sda_driver = 1'b1;
   #20;
@@ -445,6 +317,8 @@ initial begin
   #10;
   scl_enable = 1'b0;
   #60
+
+
 /*
   scl_enable = 1'b1;
   #10;

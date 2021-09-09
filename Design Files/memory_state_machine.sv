@@ -18,7 +18,9 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
       state <= RAM_WAIT;
     end
     else begin
-        if(state != next_state) begin
+        if(i2c_state_i[I2C_WAIT_bit])
+            state <= RAM_WAIT;
+        else if(state != next_state) begin
             state <= next_state;
         end
     end
@@ -103,7 +105,10 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
                                              end
                                          end
       state[RAM_MASTER_RD_DATA_bit]:     begin
-                                             if(i2c_state_i[I2C_MASTER_SEND_ACK_bit]) begin
+                                             if (mem_nack) begin
+                                                 next_state = RAM_WAIT;
+                                             end
+                                             else if(i2c_state_i[I2C_MASTER_SEND_ACK_bit]) begin
                                                  next_state = RAM_MASTER_SEND_ACK;
                                              end
                                              else begin
