@@ -160,7 +160,6 @@ void setup() {
 </p>
 
 <p>&nbsp;</p>
-<p>&nbsp;</p>
 
 <!-- [Block Diagram](Documentation/I2C_Top_Block_Diagram.png)-->
 
@@ -175,7 +174,6 @@ void setup() {
   <img width="600" src="Documentation/I2C_Subordinate_State_Machine_Diagram.png">
 </p>
 
-<p>&nbsp;</p>
 <p>&nbsp;</p>
 <!-- ![I2C State Machine Diagram](Documentation/I2C_Subordinate_State_Machine_Diagram.png) -->
 
