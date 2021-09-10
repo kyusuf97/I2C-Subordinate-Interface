@@ -64,7 +64,8 @@ clockcount cc(rst_n, scl_in, start, stop, count);
 
 
 state_machine sm(rst_n, scl_in, start, stop, address_match,
-                 read_bit, write_bit, count, hold_clock_low, received_nack,
+                 read_bit, write_bit, count, hold_clock_low,
+                 received_nack, sda_in,
                  read_address, write_ack, read_ack, read_data, write_data, scl_low_en, i2c_state);
 
 

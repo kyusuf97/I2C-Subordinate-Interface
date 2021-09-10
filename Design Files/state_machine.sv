@@ -2,7 +2,8 @@ import i2c_state_pkg::*;
 
 
 module state_machine(input logic rst_n, input logic scl, input logic start_cond, input logic stop_cond, input logic address_match,
-                     input logic read_bit, input logic write_bit, input logic [3:0] clock_count, input logic hold_clock_low, input logic received_nack,
+                     input logic read_bit, input logic write_bit, input logic [3:0] clock_count, input logic hold_clock_low,
+                     input logic received_nack, input logic sda,
                      output logic read_address, output logic write_ack, output logic read_ack,
                      output logic read_data, output logic write_data, output logic scl_low_en, output logic [6:0] i2c_state);
 
@@ -44,7 +45,9 @@ always_comb begin : next_state_comb_logic
                                             end
                                         end
     state[I2C_SUB_SEND_ACK_1_bit]:      begin
-                                            if(write_bit) begin //master sends write bit, subordinate will read incoming data from master
+                                            if(sda == 1'b1)
+                                              next_state = I2C_WAIT;
+                                            else if(write_bit) begin //master sends write bit, subordinate will read incoming data from master
                                                 next_state = I2C_MASTER_WR_DATA;
                                             end
                                             else if (read_bit) begin //master sends read bit, subordinate will write data to master
