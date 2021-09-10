@@ -10,7 +10,7 @@
 - [Examples](#Exmaples)
   - [Write to memory example](#Write-to-memory-example)
   - [Read from memory example](#Read-from-memory-example)
--[Diagrams](#Diagrams)
+- [Diagrams](#Diagrams)
 
 ## Introduction
 
