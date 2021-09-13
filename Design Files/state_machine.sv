@@ -45,7 +45,7 @@ always_comb begin : next_state_comb_logic
                                             end
                                         end
     state[I2C_SUB_SEND_ACK_1_bit]:      begin
-                                            if(sda == 1'b1)
+                                            if(sda == 1'b1) //If memory_state_machine sends does not send an ack go to wait state
                                               next_state = I2C_WAIT;
                                             else if(write_bit) begin //master sends write bit, subordinate will read incoming data from master
                                                 next_state = I2C_MASTER_WR_DATA;
