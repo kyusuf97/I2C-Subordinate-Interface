@@ -33,7 +33,8 @@ package i2c_state_pkg;
     // ------------------
     // RAM STATE MACHINE
     // ------------------
-
+    
+    // State bits for the RAM state machine
     typedef enum {
 
       RAM_WAIT_bit               = 0,
@@ -51,6 +52,7 @@ package i2c_state_pkg;
 
     } ram_state_bit;
 
+    // Shift a 1 to the bit that represents each state
     typedef enum logic [11:0] {
 
       RAM_WAIT               = 12'b1<<RAM_WAIT_bit,
