@@ -11,10 +11,12 @@
   - [Write to memory example](#Write-to-memory-example)
   - [Read from memory example](#Read-from-memory-example)
 - [Diagrams](#Diagrams)
+  - [Top Level Block Diagram](#Top-Level-Block-Diagram)
+  - [State Machine Diagrams](#State-Machine-Diagrams)
 
 ## Introduction
 
-The goal of this project was to design an I2C interface only using the [I2C standard document](https://www.nxp.com/docs/en/user-guide/UM10204.pdf). We created a memory interface to communicate over I2C with a master device. The I2C and memory interface was designed in SystemVerilog and implemented on an FPGA. This document will explain the design and specification of the subordinate device and give a couple examples of operation.
+The goal of this project was to design an I2C interface according to the [I2C-bus specification document](https://www.nxp.com/docs/en/user-guide/UM10204.pdf). We created a memory interface to communicate over I2C with a master device. The I2C and memory interface was designed in SystemVerilog and implemented on an FPGA. This document will explain the design and specification of the subordinate device and give a couple examples of operation.
 
 
 ## Objectives
@@ -57,7 +59,7 @@ During a read operation the master initiates the transmission by sending a start
   <img width="800" src="Documentation/I2C_Read_from_Memory.png">
 </p>
 <p align="center">
-  Read figure
+  Read operation
 </p>
 <p>&nbsp;</p>
 
@@ -151,6 +153,12 @@ void setup() {
 
 ## Diagrams
 
+### Top Level Block Diagram
+
+The I2C top level module is divided into the I2C interface and the memory interface. The system has been designed so that the memory interface could be replaced by any other suitably designed I2C subordinate device. The I2C interface handles all functionality concerning communication with a master device. 
+
+Note: I2C Interface is in the block diagram for clarification purposes only. It is not an RTL module.
+
 <p align="center">
   <b> Top Level Block Diagram </b>
 </p>
@@ -163,9 +171,37 @@ void setup() {
 
 <!-- [Block Diagram](Documentation/I2C_Top_Block_Diagram.png)-->
 
+### State Machine Diagrams
 
+The state machines were designed for low power by allowing for a minimal number of bits in the state vector to change for any state transition. At any instant, only one of the 7 state bits will be set to 1. Every time a state transition occurs, 2 bits of the state vector will change, and the next_state case statement only needs to check for 1 bit. The figure below shows the state vector for the I2C state machine. The same convention is used for the RAM state machine.
 
+```SV
+// State bits for subordinate state machine
+typedef enum {
 
+  I2C_WAIT_bit               = 0,
+  I2C_MASTER_WR_DEV_ADDR_bit = 1,
+  I2C_SUB_SEND_ACK_1_bit     = 2,
+  I2C_MASTER_WR_DATA_bit     = 3,
+  I2C_SUB_SEND_ACK_2_bit     = 4,
+  I2C_MASTER_RD_DATA_bit     = 5,
+  I2C_MASTER_SEND_ACK_bit    = 6
+
+} sub_state_bit;
+
+// Shift a 1 to the bit that represents each state
+typedef enum logic [6:0] {
+
+  I2C_WAIT               = 7'b1<<I2C_WAIT_bit,
+  I2C_MASTER_WR_DEV_ADDR = 7'b1<<I2C_MASTER_WR_DEV_ADDR_bit,
+  I2C_SUB_SEND_ACK_1     = 7'b1<<I2C_SUB_SEND_ACK_1_bit,
+  I2C_MASTER_WR_DATA     = 7'b1<<I2C_MASTER_WR_DATA_bit,
+  I2C_SUB_SEND_ACK_2     = 7'b1<<I2C_SUB_SEND_ACK_2_bit,
+  I2C_MASTER_RD_DATA     = 7'b1<<I2C_MASTER_RD_DATA_bit,
+  I2C_MASTER_SEND_ACK    = 7'b1<<I2C_MASTER_SEND_ACK_bit
+
+} sub_state_t;
+```
 <p align="center">
   <b> I2C State Machine Diagram </b>
 </p>
