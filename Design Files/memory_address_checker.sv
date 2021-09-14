@@ -5,7 +5,7 @@ module memory_address_checker(input logic rst_n, input logic clk, input logic sd
 
 logic [6:0] memory_start_address;
 
-always_ff @(negedge rst_n, posedge scl) begin
+always_ff @(negedge rst_n, posedge scl) begin //Store memory address
   if (!rst_n)
     memory_start_address <= 7'b0;
   else if(read_mem_address && (clock_count <= 4'd6))
@@ -13,7 +13,7 @@ always_ff @(negedge rst_n, posedge scl) begin
 end
 
 
-always_ff @(negedge rst_n, posedge clk) begin
+always_ff @(negedge rst_n, posedge clk) begin //Increment memory address after byte of data is read or written
   if (!rst_n) begin
     memory_address <= 7'b0;
     mem_nack <= 1'b0;
@@ -34,7 +34,7 @@ always_ff @(negedge rst_n, posedge clk) begin
     end
 end
 
-always_ff @(negedge rst_n, posedge scl) begin
+always_ff @(negedge rst_n, posedge scl) begin //Store memory read/write bit
   if (!rst_n) begin
     mem_read_bit <= 0;
     mem_write_bit <= 0;
