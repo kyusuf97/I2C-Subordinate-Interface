@@ -18,7 +18,7 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
       state <= RAM_WAIT;
     end
     else begin
-        if(i2c_state_i[I2C_WAIT_bit])
+        if(i2c_state_i[I2C_WAIT_bit]) //Return to wait state anytime I2C state machine is in wait state
             state <= RAM_WAIT;
         else if(state != next_state) begin
             state <= next_state;
@@ -29,7 +29,7 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
   always_comb begin
     unique case(1'b1)
       state[RAM_WAIT_bit]:               begin
-                                             if(write_bit && i2c_state_i[I2C_SUB_SEND_ACK_1_bit]) begin
+                                             if(write_bit && i2c_state_i[I2C_SUB_SEND_ACK_1_bit]) begin //Start process if we get a write bit and a valid device address is received in I2C state machine
                                                  next_state = RAM_SUB_SEND_ACK_1;
                                              end
                                              else begin
@@ -37,7 +37,7 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
                                              end
                                          end
       state[RAM_SUB_SEND_ACK_1_bit]:     begin
-                                             if(i2c_state_i[I2C_MASTER_WR_DATA_bit] && !sda_en) begin //S_ReadData in state_machine
+                                             if(i2c_state_i[I2C_MASTER_WR_DATA_bit] && !sda_en) begin //Drive sda low for ack, wait for sda_en to go low before changing state
                                                  next_state = RAM_MASTER_WR_MEM_ADDR;
                                              end
                                              else begin
@@ -45,7 +45,7 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
                                              end
                                          end
       state[RAM_MASTER_WR_MEM_ADDR_bit]: begin
-                                             if(i2c_state_i[I2C_SUB_SEND_ACK_2_bit]) begin //S_WRITE_ACK_2 in state_machine
+                                             if(i2c_state_i[I2C_SUB_SEND_ACK_2_bit]) begin //Store initial memory address
                                                  next_state = RAM_SUB_SEND_ACK_2;
                                              end
                                              else begin
@@ -53,7 +53,7 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
                                              end
                                          end
       state[RAM_SUB_SEND_ACK_2_bit]:     begin
-                                             if (mem_write_bit && (i2c_state_i[I2C_MASTER_WR_DATA_bit]) && !sda_en) begin
+                                             if (mem_write_bit && (i2c_state_i[I2C_MASTER_WR_DATA_bit]) && !sda_en) begin //Drive sda low for ack, wait for sda_en to go low before changing state
                                                  next_state = RAM_MASTER_WR_DATA;
                                              end
                                              else if(mem_read_bit && (i2c_state_i[I2C_MASTER_WR_DATA_bit]) && !sda_en) begin
@@ -63,19 +63,21 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
                                                  next_state = RAM_SUB_SEND_ACK_2;
                                              end
                                          end
+
+      //Master write to memory
       state[RAM_MASTER_WR_DATA_bit]:     begin
-                                            if (mem_nack || i2c_state_i[I2C_WAIT_bit] || i2c_state_i[I2C_MASTER_WR_DEV_ADDR_bit]) begin
+                                            if (mem_nack || i2c_state_i[I2C_WAIT_bit] || i2c_state_i[I2C_MASTER_WR_DEV_ADDR_bit]) begin //Go to wait state if we receive a nack from master, or if we get a repeated start condition
                                                  next_state = RAM_WAIT;
                                              end
-                                             else if(i2c_state_i[I2C_SUB_SEND_ACK_2_bit]) begin // i2c_state == S_WRITE_ACK_2
+                                             else if(i2c_state_i[I2C_SUB_SEND_ACK_2_bit]) begin
                                                  next_state = RAM_SUB_SEND_ACK_3;
                                              end
                                              else begin
                                                  next_state = RAM_MASTER_WR_DATA;
                                              end
                                          end
-      state[RAM_SUB_SEND_ACK_3_bit]:     begin //(save mem data)
-                                             if(i2c_state_i[I2C_MASTER_WR_DATA_bit] && !sda_en) begin
+      state[RAM_SUB_SEND_ACK_3_bit]:     begin
+                                             if(i2c_state_i[I2C_MASTER_WR_DATA_bit] && !sda_en) begin //Drive sda low for ack, wait for sda_en to go low before changing state
                                                  next_state = RAM_INCR_MEM_ADDR_1;
                                              end
                                              else begin
@@ -83,13 +85,15 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
                                              end
                                          end
       state[RAM_INCR_MEM_ADDR_1_bit]:    begin
-                                             next_state = RAM_MASTER_WR_DATA;
+                                             next_state = RAM_MASTER_WR_DATA; //Increment memory address by one
                                          end
+
+      //Master read from memory
       state[RAM_MASTER_WR_DEV_ADDR_bit]: begin
                                              if(read_bit && (i2c_state_i[I2C_SUB_SEND_ACK_1_bit])) begin
                                                  next_state = RAM_SUB_SEND_ACK_4;
                                              end
-                                             else if(write_bit && (i2c_state_i[I2C_SUB_SEND_ACK_1_bit])) begin
+                                             else if(write_bit && (i2c_state_i[I2C_SUB_SEND_ACK_1_bit])) begin //If we get a write bit the operation is not valid, return to wait state
                                                  next_state = RAM_WAIT;
                                              end
                                              else begin
@@ -105,10 +109,10 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
                                              end
                                          end
       state[RAM_MASTER_RD_DATA_bit]:     begin
-                                             if (mem_nack) begin
+                                             if (mem_nack) begin //return to wait state if memory cannot execute operation
                                                  next_state = RAM_WAIT;
                                              end
-                                             else if(i2c_state_i[I2C_MASTER_SEND_ACK_bit]) begin
+                                             else if(i2c_state_i[I2C_MASTER_SEND_ACK_bit]) begin //Receive ack from master after master reads byte of data
                                                  next_state = RAM_MASTER_SEND_ACK;
                                              end
                                              else begin
@@ -116,7 +120,7 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
                                              end
                                          end
       state[RAM_MASTER_SEND_ACK_bit]:    begin
-                                             if (received_nack) begin
+                                             if (received_nack) begin //Return to wait state if master sends nack
                                                  next_state = RAM_WAIT;
                                              end
                                              else if(i2c_state_i[I2C_MASTER_RD_DATA_bit]) begin
@@ -127,7 +131,7 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
                                              end
                                          end
       state[RAM_INCR_MEM_ADDR_2_bit]:    begin
-                                             next_state = RAM_MASTER_RD_DATA;
+                                             next_state = RAM_MASTER_RD_DATA; //Increment memory address by one
                                          end
       default:                           begin
                                              next_state = RAM_WAIT;
