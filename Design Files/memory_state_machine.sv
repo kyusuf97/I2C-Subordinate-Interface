@@ -4,8 +4,8 @@ import i2c_state_pkg::*;
 module memory_state_machine(input logic rst_n, input logic clk, input logic read_bit, input logic write_bit,
                             input logic [6:0] i2c_state, input logic mem_read_bit, input logic mem_write_bit,
                             input logic sda_en, input logic received_nack, input logic mem_nack,
-                            output logic write_ack, output logic read_mem_address, output logic write_mem,
-                            output logic read_mem, output logic wren, output logic increment_mem_address);
+                            output logic sub_send_ack, output logic master_wr_mem_addr, output logic master_wr_data,
+                            output logic master_rd_data, output logic wren, output logic increment_mem_address);
 
   sub_state_t i2c_state_i;
   ram_state_t state;
@@ -139,11 +139,11 @@ module memory_state_machine(input logic rst_n, input logic clk, input logic read
     endcase
   end
 
-  assign write_ack             = state[RAM_SUB_SEND_ACK_1_bit] | state[RAM_SUB_SEND_ACK_2_bit] | state[RAM_SUB_SEND_ACK_3_bit] | state[RAM_SUB_SEND_ACK_4_bit];
-  assign read_mem_address      = state[RAM_MASTER_WR_MEM_ADDR_bit];
-  assign write_mem             = state[RAM_MASTER_WR_DATA_bit];
+  assign sub_send_ack             = state[RAM_SUB_SEND_ACK_1_bit] | state[RAM_SUB_SEND_ACK_2_bit] | state[RAM_SUB_SEND_ACK_3_bit] | state[RAM_SUB_SEND_ACK_4_bit];
+  assign master_wr_mem_addr      = state[RAM_MASTER_WR_MEM_ADDR_bit];
+  assign master_wr_data             = state[RAM_MASTER_WR_DATA_bit];
   assign wren                  = state[RAM_SUB_SEND_ACK_3_bit];
   assign increment_mem_address = state[RAM_INCR_MEM_ADDR_1_bit] | state[RAM_INCR_MEM_ADDR_2_bit];
-  assign read_mem              = state[RAM_MASTER_RD_DATA_bit];
+  assign master_rd_data              = state[RAM_MASTER_RD_DATA_bit];
 
 endmodule: memory_state_machine

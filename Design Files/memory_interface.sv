@@ -17,10 +17,10 @@ logic mem_read_bit;
 logic mem_write_bit;
 
 //mmeory state machine outputs
-logic write_ack;
-logic read_mem_address;
-logic write_mem;
-logic read_mem;
+logic sub_send_ack;
+logic master_wr_mem_addr;
+logic master_wr_data;
+logic master_rd_data;
 logic increment_mem_address;
 logic wren_set;
 
@@ -31,11 +31,11 @@ logic wren_capt;
 memory_state_machine msm(rst_n, clk, read_bit, write_bit,
                          i2c_state, mem_read_bit, mem_write_bit,
                          sda_en, received_nack, mem_nack,
-                         write_ack, read_mem_address, write_mem,
-                         read_mem, wren_set, increment_mem_address);
+                         sub_send_ack, master_wr_mem_addr, master_wr_data,
+                         master_rd_data, wren_set, increment_mem_address);
 
 memory_address_checker mac(rst_n, clk, sda_in, scl_in,
-                           read_mem_address, clock_count, increment_mem_address,
+                           master_wr_mem_addr, clock_count, increment_mem_address,
                            mem_address, mem_read_bit, mem_write_bit, mem_nack);
 
 mem s_ram(mem_address, clk, mem_buffer, wren, mem_rddata);
@@ -62,7 +62,7 @@ end
 always_ff @(negedge rst_n, posedge scl_in) begin //memory buffer for incoming data from sda
   if (!rst_n)
     mem_buffer <= 8'b0;
-  else if (write_mem)
+  else if (master_wr_data)
     mem_buffer[4'd7 - clock_count] <= sda_in;
 end
 
@@ -70,9 +70,9 @@ end
 always_ff @(negedge rst_n, negedge scl_in) begin //Read data from memory and drive ack
   if (!rst_n)
     sda_out <= 0;
-  else if (read_mem)
+  else if (master_rd_data)
     sda_out <= mem_rddata[4'd7 - clock_count];
-  else if (write_ack)
+  else if (sub_send_ack)
     sda_out <= 0;
   else
     sda_out <= 1;
