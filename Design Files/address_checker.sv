@@ -8,11 +8,11 @@ module address_checker (input logic rst_n, input logic sda, input logic scl, inp
 
 
 logic [6:0] device_address;
-assign device_address = 7'b1100110;
-
 logic [6:0] address;
+assign device_address = 7'b1100110; //Unique I2C device address
 
-always_ff @(posedge scl or negedge rst_n) begin
+
+always_ff @(posedge scl or negedge rst_n) begin //Store 7 bit device address
   if (!rst_n)
     address <= 7'b0;
   else begin
@@ -21,15 +21,15 @@ always_ff @(posedge scl or negedge rst_n) begin
   end
 end
 
-always_comb begin
+always_comb begin //Check if device address matches address received from master
   if (read_address && (clock_count == 4'd7) && (address == device_address))
     address_match = 1'b1;
   else
     address_match = 1'b0;
 end
 
-//Add in reset for start/stop condiiton
-always_ff @(posedge scl, negedge rst_n, posedge start, posedge stop) begin
+
+always_ff @(posedge scl, negedge rst_n, posedge start, posedge stop) begin //Store read/write bit 
   if (!rst_n || start || stop) begin
     read_bit <= 1'b0;
     write_bit <= 1'b0;
