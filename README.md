@@ -16,7 +16,7 @@
 
 ## Introduction
 
-The goal of this project was to design an I2C interface according to the [I2C-bus specification document](https://www.nxp.com/docs/en/user-guide/UM10204.pdf). We created a memory interface to communicate over I2C with a master device. The I2C and memory interface was designed in SystemVerilog and implemented on an FPGA. This document will explain the design and specification of the subordinate device and give a couple examples of operation.
+The goal of this project was to design an I2C interface according to the [I2C-bus specification document](UM10204_NXPSemiconductors.pdf). We created a memory interface to communicate over I2C with a master device. The I2C and memory interface was designed in SystemVerilog and implemented on an FPGA. This document will explain the design and specification of the subordinate device and give a couple examples of operation.
 
 
 ## Objectives
